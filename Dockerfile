@@ -1,4 +1,8 @@
-FROM registry.gitlab.com/pages/hugo:latest as builder
+ARG HUGO_VERSION=0.59.0
+
+# Prefer Hugo as the base image, rather than alpine directly. Should hopefully
+# help with debugging mozjpeg builds if the image changes in future.
+FROM registry.gitlab.com/pages/hugo:${HUGO_VERSION} as builder
 
 RUN apk --update add \
     autoconf \
@@ -16,10 +20,12 @@ RUN wget -O /tmp/mozjpeg.tar.gz https://github.com/mozilla/mozjpeg/archive/v${MO
     && tar -xvf /tmp/mozjpeg.tar.gz -C /tmp \
     && autoreconf -fiv /tmp/mozjpeg-${MOZJPEG_VERSION} \
     && /tmp/mozjpeg-${MOZJPEG_VERSION}/configure --prefix /opt/mozjpeg \
-    && make install
+    && make install \
+    && /opt/mozjpeg/bin/cjpeg -version
 
-FROM registry.gitlab.com/pages/hugo:latest
+# Build the release image
+FROM registry.gitlab.com/pages/hugo:${HUGO_VERSION}
 RUN apk --update --no-cache add pngquant
 COPY --from=builder /opt/mozjpeg /opt/mozjpeg/
-ADD compress.sh /opt
-CMD sh /opt/compress.sh
+ADD build.sh /opt
+CMD sh /opt/build.sh
