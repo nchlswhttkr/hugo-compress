@@ -1,0 +1,21 @@
+name: Build & Releases
+
+on:
+  push:
+    branches:
+      - master
+      - versioning-releases # TODO remove
+    paths:
+      - Dockerfile
+      - build.sh
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - run: docker login docker.pkg.github.com -u nchlswhttkr -p ${{ secrets.GITHUB_TOKEN }}
+      - run: "docker build -t docker.pkg.github.com/nchlswhttkr/hugo-compress:${{ github.sha }} ."
+      - run: "docker push docker.pkg.github.com/nchlswhttkr/hugo-compress:${{ github.sha }}"
+      - run: "docker build -t docker.pkg.github.com/nchlswhttkr/hugo-compress:latest ."
+      - run: "docker push docker.pkg.github.com/nchlswhttkr/hugo-compress:latest"
