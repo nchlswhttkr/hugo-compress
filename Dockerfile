@@ -1,4 +1,4 @@
-ARG HUGO_VERSION=0.59.0
+ARG HUGO_VERSION=0.59.1
 
 # Prefer Hugo as the base image, rather than alpine directly. Should hopefully
 # help with debugging mozjpeg builds if the image changes in future.
@@ -25,6 +25,7 @@ RUN wget -O /tmp/mozjpeg.tar.gz https://github.com/mozilla/mozjpeg/archive/v${MO
 
 # Build the release image
 FROM registry.gitlab.com/pages/hugo:${HUGO_VERSION}
+# Installing pngquant is smaller and easier than building it
 RUN apk --update --no-cache add pngquant
 COPY --from=builder /opt/mozjpeg /opt/mozjpeg/
 ADD build.sh /opt

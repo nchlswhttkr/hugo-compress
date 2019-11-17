@@ -15,8 +15,8 @@ jobs:
       - uses: actions/checkout@v1
       - run: |
           docker login docker.pkg.github.com -u nchlswhttkr -p ${{ secrets.GITHUB_TOKEN }}
-          docker build \
+          docker build . \
             -t docker.pkg.github.com/nchlswhttkr/hugo-compress/hugo-compress:${{ github.sha }} \
-            -t docker.pkg.github.com/nchlswhttkr/hugo-compress/hugo-compress:latest .
+            -t docker.pkg.github.com/nchlswhttkr/hugo-compress/hugo-compress:latest
           docker push docker.pkg.github.com/nchlswhttkr/hugo-compress/hugo-compress:${{ github.sha }}
           docker push docker.pkg.github.com/nchlswhttkr/hugo-compress/hugo-compress:latest
